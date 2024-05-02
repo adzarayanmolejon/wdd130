@@ -51,9 +51,24 @@ function resetQueue(queueType) {
 }
 
 function callNumber(queueType) {
-    let queueNumbers = printedNumbers[queueType];
+    let queueNumbers;
+    switch (queueType) {
+        case 'single':
+            queueNumbers = singleQueue;
+            break;
+        case 'multiple':
+            queueNumbers = multipleQueue;
+            break;
+        case 'priority':
+            queueNumbers = priorityQueue;
+            break;
+        default:
+            console.error('Invalid queue type');
+            return;
+    }
+
     if (queueNumbers.length > 0) {
-        let nextNumber = queueNumbers.shift();
+        let nextNumber = queueNumbers.shift().number;
         alert(`Calling ${queueType} queue number: ${nextNumber}`);
         playAudio(); // Call the playAudio function
     } else {
