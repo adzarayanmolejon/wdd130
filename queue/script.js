@@ -28,28 +28,6 @@ function assignQueueNumber(name, queueType) {
     }
     displayVisualCallout(newNumber);
 }
-
-function displayVisualCallout(number) {
-    document.getElementById('visualCallout').innerText = `Calling number ${number}`;
-}
-
-function resetQueue(queueType) {
-    switch (queueType) {
-        case 'single':
-            singleQueue = [];
-            break;
-        case 'multiple':
-            multipleQueue = [];
-            break;
-        case 'priority':
-            priorityQueue = [];
-            break;
-        default:
-            console.error('Invalid queue type');
-            return;
-    }
-}
-
 function callNumber(queueType) {
     let queueNumbers;
     switch (queueType) {
@@ -75,7 +53,6 @@ function callNumber(queueType) {
         alert(`No more numbers to call for ${queueType} queue`);
     }
 }
-
 function playAudio() {
     let audio = document.getElementById('audio');
     audio.play();
