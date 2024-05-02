@@ -8,42 +8,47 @@
 </head>
 <body>
     <h1>Virtual Queuing System</h1>
+
+    <!-- Form for user input -->
+    <form id="queueForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <button type="submit">Join Queue</button>
+    </form>
+
+    <!-- Display the called number visually -->
+    <div id="visualCallout"></div>
+
+    <!-- Single Queue -->
     <h2>Single Queue</h2>
     <p>Queue Number: <span id="singleQueueNumber">0</span></p>
     <button onclick="nextNumber('single')">Next Number</button>
     <button onclick="printNumber('single')">Print Number</button>
     <button onclick="callNumber('single')">Call Number</button>
 
+    <!-- Multiple Queue -->
     <h2>Multiple Queue</h2>
     <p>Queue Number: <span id="multipleQueueNumber">0</span></p>
     <button onclick="nextNumber('multiple')">Next Number</button>
     <button onclick="printNumber('multiple')">Print Number</button>
     <button onclick="callNumber('multiple')">Call Number</button>
 
+    <!-- Priority Queue -->
     <h2>Priority Queue</h2>
     <p>Queue Number: <span id="priorityQueueNumber">0</span></p>
     <button onclick="nextNumber('priority')">Next Number</button>
     <button onclick="printNumber('priority')">Print Number</button>
     <button onclick="callNumber('priority')">Call Number</button>
 
-    <audio id="audio" src=""></audio> <!-- Change 'notification.mp3' to the path of your audio file -->
+    <!-- Audio element (replace src with your audio file) -->
+    <audio id="audio" src="audio/Aylex.mp3"></audio>
+
+    <!-- Reset buttons -->
+    <button onclick="resetQueue('single')">Reset Single Queue</button>
+    <button onclick="resetQueue('multiple')">Reset Multiple Queue</button>
+    <button onclick="resetQueue('priority')">Reset Priority Queue</button>
+
+    <!-- Your JavaScript code (script.js) should handle queue logic -->
     <script src="script.js"></script>
 </body>
 </html>
-<!-- Add a form for user input -->
-<form id="queueForm">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
-    <button type="submit">Join Queue</button>
-</form>
-
-<!-- Display the called number visually -->
-<div id="visualCallout"></div>
-
-<!-- Add reset buttons for each queue type -->
-<button onclick="resetQueue('single')">Reset Single Queue</button>
-<button onclick="resetQueue('multiple')">Reset Multiple Queue</button>
-<button onclick="resetQueue('priority')">Reset Priority Queue</button>
-
-<!-- Add an audio element -->
-<audio id="audio" src="audio/Aylex.mp3"></audio>
