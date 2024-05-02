@@ -6,24 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Virtual Queuing System</title>
 </head>
-<body>
-    <h1>Virtual Queuing System</h1>
+        <!-- Form for user input -->
+        <form id="queueForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="queueType">Choose Queue Type:</label>
+            <select id="queueType" name="queueType">
+                <option value="single">Single Queue</option>
+                <option value="multiple">Multiple Queue</option>
+                <option value="priority">Priority Queue</option>
+            </select>
+            <button type="submit">Join Queue</button>
+        </form>
+    
+        <!-- Display the called number visually -->
+        <div id="visualCallout"></div>
+    
+        <!-- Your JavaScript code (script.js) should handle queue logic -->
+        <script src="script.js"></script>
+    </body>
+    </html>
+    
+    <!-- Audio element (replace src with your audio file) -->
+    <audio id="audio" src="audio/Aylex.mp3"></audio>
 
-    <!-- Form for user input -->
-    <form id="queueForm">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-        <label for="queueType">Choose Queue Type:</label>
-        <select id="queueType" name="queueType">
-            <option value="single">Single Queue</option>
-            <option value="multiple">Multiple Queue</option>
-            <option value="priority">Priority Queue</option>
-        </select>
-        <button type="submit">Join Queue</button>
-    </form>
-
-    <!-- Display the called number visually -->
-    <div id="visualCallout"></div>
+    <!-- Reset buttons -->
+    <button onclick="resetQueue('single')">Reset Single Queue</button>
+    <button onclick="resetQueue('multiple')">Reset Multiple Queue</button>
+    <button onclick="resetQueue('priority')">Reset Priority Queue</button>
 
     <!-- Your JavaScript code (script.js) should handle queue logic -->
     <script src="script.js"></script>
