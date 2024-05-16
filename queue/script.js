@@ -1,62 +1,46 @@
-let singleQueue = [];
-let multipleQueue = [];
-let priorityQueue = [];
-let queueNumber = 1;
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('queueForm');
+    const visualCallout = document.getElementById('visualCallout');
+    const audio = document.getElementById('audio');
 
-document.getElementById('queueForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    let name = document.getElementById('name').value;
-    let queueType = 'single'; // Assume single queue for now
-    assignQueueNumber(name, queueType);
+    let queues = {
+        single: [],
+        multiple: [],
+        priority: []
+    };
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = document.getElementById('name').value;
+        const queueType = document.getElementById('queueType').value;
+
+        queues[queueType].push(name);
+        alert(`${name} has joined the ${queueType} queue.`);
+        form.reset();
+    });
+
+    window.resetQueue = function(type) {
+        queues[type] = [];
+        alert(`${type.charAt(0).toUpperCase() + type.slice(1)} queue has been reset.`);
+    };
+
+    // Example function to call the next person in the queue
+    function callNext(queueType) {
+        if (queues[queueType].length > 0) {
+            const nextPerson = queues[queueType].shift();
+            visualCallout.textContent = `Next in ${queueType} queue: ${nextPerson}`;
+            audio.play();
+        } else {
+            alert(`No one is in the ${queueType} queue.`);
+        }
+    }
+
+    // Example usage of callNext
+    setInterval(() => {
+        callNext('single');
+    }, 10000); // Calls the next person in the 'single' queue every 10 seconds
 });
 
-function assignQueueNumber(name, queueType) {
-    let newNumber = queueNumber++;
-    switch (queueType) {
-        case 'single':
-            singleQueue.push({ number: newNumber, name: name });
-            break;
-        case 'multiple':
-            multipleQueue.push({ number: newNumber, name: name });
-            break;
-        case 'priority':
-            priorityQueue.push({ number: newNumber, name: name });
-            break;
-        default:
-            console.error('Invalid queue type');
-            return;
-    }
-    displayVisualCallout(newNumber);
-}
-function callNumber(queueType) {
-    let queueNumbers;
-    switch (queueType) {
-        case 'single':
-            queueNumbers = singleQueue;
-            break;
-        case 'multiple':
-            queueNumbers = multipleQueue;
-            break;
-        case 'priority':
-            queueNumbers = priorityQueue;
-            break;
-        default:
-            console.error('Invalid queue type');
-            return;
-    }
-
-    if (queueNumbers.length > 0) {
-        let nextNumber = queueNumbers.shift().number;
-        alert(`Calling ${queueType} queue number: ${nextNumber}`);
-        playAudio(); // Call the playAudio function
-    } else {
-        alert(`No more numbers to call for ${queueType} queue`);
-    }
-}
-function playAudio() {
-    let audio = document.getElementById('audio');
-    audio.play();
-}
 function callNextUser(nameOrNumber) {
     // ... your existing logic to determine nameOrNumber (user to serve)
   
