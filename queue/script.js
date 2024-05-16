@@ -57,3 +57,16 @@ function playAudio() {
     let audio = document.getElementById('audio');
     audio.play();
 }
+function callNextUser(nameOrNumber) {
+    // ... your existing logic to determine nameOrNumber (user to serve)
+  
+    // Create a SpeechSynthesisUtterance object
+    const utterance = new SpeechSynthesisUtterance();
+  
+    // Set the text to be spoken
+    utterance.text = `Now serving number ${nameOrNumber}`;
+  
+    // Speak the utterance
+    window.speechSynthesis.speak(utterance);
+  }
+  
