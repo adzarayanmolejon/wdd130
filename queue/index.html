@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Queuing System</title>
+    <title>Queue Management System</title>
 </head>
 <body>
-    <!-- Form for user input -->
+    <!-- Admin Interface -->
+    <h1>Queue Admin</h1>
     <form id="queueForm">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required>
@@ -20,18 +20,59 @@
         <button type="submit">Join Queue</button>
     </form>
 
-    <!-- Display the called number visually -->
-    <div id="visualCallout"></div>
-
-    <!-- Audio element (replace src with your audio file) -->
-    <audio id="audio" src="audio/Aylex.mp3"></audio>
-
-    <!-- Reset buttons -->
     <button onclick="resetQueue('single')">Reset Single Queue</button>
     <button onclick="resetQueue('multiple')">Reset Multiple Queue</button>
     <button onclick="resetQueue('priority')">Reset Priority Queue</button>
+    <button onclick="callNext('single')">Call Next in Single Queue</button>
+    <button onclick="callNext('multiple')">Call Next in Multiple Queue</button>
+    <button onclick="callNext('priority')">Call Next in Priority Queue</button>
 
-    <!-- Your JavaScript code (script.js) should handle queue logic -->
-    <script src="script.js"></script>
+    <!-- Display Currently Serving Client -->
+    <h1>Now Serving</h1>
+    <div id="nowServing">Now Serving: </div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:8080');
+
+        // Handle form submission
+        document.getElementById('queueForm').addEventListener('submit', event => {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const queueType = document.getElementById('queueType').value;
+
+            ws.send(JSON.stringify({
+                type: 'join',
+                name: name,
+                queueType: queueType
+            }));
+
+            // Clear the form
+            event.target.reset();
+        });
+
+        // Handle reset queue
+        function resetQueue(queueType) {
+            ws.send(JSON.stringify({
+                type: 'reset',
+                queueType: queueType
+            }));
+        }
+
+        // Handle call next person
+        function callNext(queueType) {
+            ws.send(JSON.stringify({
+                type: 'call',
+                queueType: queueType
+            }));
+        }
+
+        // Handle incoming messages
+        ws.onmessage = event => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'call') {
+                document.getElementById('nowServing').textContent = `Now Serving: ${data.name}`;
+            }
+        };
+    </script>
 </body>
 </html>

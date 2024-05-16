@@ -1,56 +1,41 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('queueForm');
-    const visualCallout = document.getElementById('visualCallout');
-    const audio = document.getElementById('audio');
+const WebSocket = require('ws');
 
-    let queues = {
-        single: [],
-        multiple: [],
-        priority: []
-    };
+const server = new WebSocket.Server({ port: 8080 });
 
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const name = document.getElementById('name').value;
-        const queueType = document.getElementById('queueType').value;
+let queues = {
+    single: [],
+    multiple: [],
+    priority: []
+};
 
-        queues[queueType].push(name);
-        alert(`${name} has joined the ${queueType} queue.`);
-        form.reset();
-    });
-
-    window.resetQueue = function(type) {
-        queues[type] = [];
-        alert(`${type.charAt(0).toUpperCase() + type.slice(1)} queue has been reset.`);
-    };
-
-    // Example function to call the next person in the queue
-    function callNext(queueType) {
-        if (queues[queueType].length > 0) {
-            const nextPerson = queues[queueType].shift();
-            visualCallout.textContent = `Next in ${queueType} queue: ${nextPerson}`;
-            audio.play();
-        } else {
-            alert(`No one is in the ${queueType} queue.`);
+server.on('connection', ws => {
+    ws.on('message', message => {
+        const data = JSON.parse(message);
+        switch (data.type) {
+            case 'join':
+                queues[data.queueType].push(data.name);
+                break;
+            case 'reset':
+                queues[data.queueType] = [];
+                break;
+            case 'call':
+                if (queues[data.queueType].length > 0) {
+                    const nextPerson = queues[data.queueType].shift();
+                    broadcast({
+                        type: 'call',
+                        queueType: data.queueType,
+                        name: nextPerson
+                    });
+                }
+                break;
         }
-    }
-
-    // Example usage of callNext
-    setInterval(() => {
-        callNext('single');
-    }, 10000); // Calls the next person in the 'single' queue every 10 seconds
+    });
 });
 
-function callNextUser(nameOrNumber) {
-    // ... your existing logic to determine nameOrNumber (user to serve)
-  
-    // Create a SpeechSynthesisUtterance object
-    const utterance = new SpeechSynthesisUtterance();
-  
-    // Set the text to be spoken
-    utterance.text = `Now serving number ${nameOrNumber}`;
-  
-    // Speak the utterance
-    window.speechSynthesis.speak(utterance);
-  }
-  
+function broadcast(data) {
+    server.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(data));
+        }
+    });
+}
