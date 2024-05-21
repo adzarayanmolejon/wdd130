@@ -1,49 +1,81 @@
-const http = require('http');
-const WebSocket = require('ws');
+<script>
+    let ws;
 
-const server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('WebSocket server is running.');
-});
-
-const wss = new WebSocket.Server({ server });
-
-const queues = {
-    single: [],
-    multiple: [],
-    priority: [],
-};
-
-wss.on('connection', (ws) => {
-    console.log('Client connected.');
-
-    ws.on('message', (message) => {
-        const data = JSON.parse(message);
-        switch (data.type) {
-            case 'join':
-                queues[data.queueType].push(data.name);
-                break;
-            case 'reset':
-                queues[data.queueType] = [];
-                break;
-            case 'call':
-                if (queues[data.queueType].length > 0) {
-                    const name = queues[data.queueType].shift();
-                    ws.send(JSON.stringify({ type: 'call', name: name }));
-                } else {
-                    ws.send(JSON.stringify({ type: 'call', name: 'No one in queue' }));
-                }
-                break;
-            default:
-                console.log('Unknown message type:', data.type);
+    function connectWebSocket() {
+        if (ws && (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)) {
+            return; // WebSocket already connected or connecting
         }
-    });
 
-    ws.on('close', () => {
-        console.log('Client disconnected.');
-    });
-});
+        ws = new WebSocket('ws://localhost:8080');
+        
+        ws.onopen = () => {
+            console.log('WebSocket connected.');
+        };
 
-server.listen(8080, () => {
-    console.log('WebSocket server is listening on port 8080.');
-});
+        ws.onmessage = event => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'call') {
+                document.getElementById('nowServing').textContent = `Now Serving: ${data.name}`;
+            } else if (data.message) {
+                console.log(data.message);
+            }
+        };
+
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        ws.onclose = () => {
+            console.log('WebSocket connection closed.');
+        };
+    }
+
+    function joinQueue() {
+        const name = document.getElementById('name').value;
+        const queueType = document.getElementById('queueType').value;
+
+        if (!name || !queueType) {
+            console.error('Name and queue type are required.');
+            return;
+        }
+
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            console.error('WebSocket is not connected.');
+            return;
+        }
+
+        ws.send(JSON.stringify({
+            type: 'join',
+            name: name,
+            queueType: queueType
+        }));
+    }
+
+    function resetQueue(queueType) {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            console.error('WebSocket is not connected.');
+            return;
+        }
+
+        ws.send(JSON.stringify({
+            type: 'reset',
+            queueType: queueType
+        }));
+    }
+
+    function callNext(queueType) {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            console.error('WebSocket is not connected.');
+            return;
+        }
+
+        ws.send(JSON.stringify({
+            type: 'call',
+            queueType: queueType
+        }));
+    }
+
+    // Connect WebSocket on page load
+    connectWebSocket();
+</script>
+
