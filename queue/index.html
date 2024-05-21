@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Queue Management System</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Admin Interface -->
@@ -71,7 +72,19 @@
             const data = JSON.parse(event.data);
             if (data.type === 'call') {
                 document.getElementById('nowServing').textContent = `Now Serving: ${data.name}`;
+            } else if (data.message) {
+                console.log(data.message);
             }
+        };
+
+        // Handle WebSocket connection errors
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        // Handle WebSocket connection close
+        ws.onclose = () => {
+            console.log('WebSocket connection closed.');
         };
     </script>
 </body>

@@ -1,15 +1,23 @@
+const http = require('http');
 const WebSocket = require('ws');
 
-const server = new WebSocket.Server({ port: 8080 });
+const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('WebSocket server is running.');
+});
 
-let queues = {
+const wss = new WebSocket.Server({ server });
+
+const queues = {
     single: [],
     multiple: [],
-    priority: []
+    priority: [],
 };
 
-server.on('connection', ws => {
-    ws.on('message', message => {
+wss.on('connection', (ws) => {
+    console.log('Client connected.');
+
+    ws.on('message', (message) => {
         const data = JSON.parse(message);
         switch (data.type) {
             case 'join':
@@ -20,22 +28,22 @@ server.on('connection', ws => {
                 break;
             case 'call':
                 if (queues[data.queueType].length > 0) {
-                    const nextPerson = queues[data.queueType].shift();
-                    broadcast({
-                        type: 'call',
-                        queueType: data.queueType,
-                        name: nextPerson
-                    });
+                    const name = queues[data.queueType].shift();
+                    ws.send(JSON.stringify({ type: 'call', name: name }));
+                } else {
+                    ws.send(JSON.stringify({ type: 'call', name: 'No one in queue' }));
                 }
                 break;
+            default:
+                console.log('Unknown message type:', data.type);
         }
+    });
+
+    ws.on('close', () => {
+        console.log('Client disconnected.');
     });
 });
 
-function broadcast(data) {
-    server.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify(data));
-        }
-    });
-}
+server.listen(8080, () => {
+    console.log('WebSocket server is listening on port 8080.');
+});
