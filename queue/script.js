@@ -1,49 +1,43 @@
-const http = require('http');
-const WebSocket = require('ws');
+const ws = new WebSocket('ws://localhost:8080');
 
-const server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('WebSocket server is running.');
+// Event listeners for WebSocket events
+ws.addEventListener('open', () => {
+    console.log('WebSocket connection established.');
+    // You can send initial data here if needed.
 });
 
-const wss = new WebSocket.Server({ server });
-
-const queues = {
-    single: [],
-    multiple: [],
-    priority: [],
-};
-
-wss.on('connection', (ws) => {
-    console.log('Client connected.');
-
-    ws.on('message', (message) => {
-        const data = JSON.parse(message);
-        switch (data.type) {
-            case 'join':
-                queues[data.queueType].push(data.name);
-                break;
-            case 'reset':
-                queues[data.queueType] = [];
-                break;
-            case 'call':
-                if (queues[data.queueType].length > 0) {
-                    const name = queues[data.queueType].shift();
-                    ws.send(JSON.stringify({ type: 'call', name: name }));
-                } else {
-                    ws.send(JSON.stringify({ type: 'call', name: 'No one in queue' }));
-                }
-                break;
-            default:
-                console.log('Unknown message type:', data.type);
-        }
-    });
-
-    ws.on('close', () => {
-        console.log('Client disconnected.');
-    });
+ws.addEventListener('message', (event) => {
+    console.log('Received message:', event.data);
+    // Handle incoming messages from the server.
 });
 
-server.listen(8080, () => {
-    console.log('WebSocket server is listening on port 8080.');
+ws.addEventListener('close', (event) => {
+    console.log('WebSocket connection closed:', event.code, event.reason);
+    // Handle any cleanup or reconnection logic.
 });
+
+ws.addEventListener('error', (error) => {
+    console.error('WebSocket error:', error);
+    // Handle any errors.
+});
+
+// Assuming you have a function that updates the "Now Serving" section
+function updateNowServing(clientName) {
+    // Update the display
+    document.getElementById('nowServing').textContent = `Now Serving: ${clientName}`;
+
+    // Call the voice announcement function
+    announceClientName(clientName);
+}
+
+// Function to announce the client's name
+function announceClientName(clientName) {
+    const utterance = new SpeechSynthesisUtterance(clientName);
+    utterance.lang = 'en-US'; // Set the language (adjust as needed)
+    utterance.volume = 1; // Adjust volume if necessary
+
+    // Repeat the announcement three times
+    for (let i = 0; i < 3; i++) {
+        speechSynthesis.speak(utterance);
+    }
+}
